@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { connect } from 'react-redux';
 
 import classes from './ContactData.module.css';
@@ -11,123 +11,118 @@ import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actionCreators from '../../../store/actions/index';
 import { updateObject, checkInputValidity } from '../../../shared/utility';
 
-class ContactData extends Component {
-  state = {
-    orderForm: {
-      name: {
-        elementType: 'input',
-        elementConfig: {
-          type: 'text',
-          placeholder: 'Your Name',
-        },
-        value: '',
-        validation: {
-          required: true,
-        },
-        valid: false,
-        touched: false,
+const ContactData = props => {
+  const [orderForm, setOrderForm] = useState({
+    name: {
+      elementType: 'input',
+      elementConfig: {
+        type: 'text',
+        placeholder: 'Your Name',
       },
-      street: {
-        elementType: 'input',
-        elementConfig: {
-          type: 'text',
-          placeholder: 'Street',
-        },
-        value: '',
-        validation: {
-          required: true,
-        },
-        valid: false,
-        touched: false,
+      value: '',
+      validation: {
+        required: true,
       },
-      zipCode: {
-        elementType: 'input',
-        elementConfig: {
-          type: 'text',
-          placeholder: 'ZIP Code',
-        },
-        value: '',
-        validation: {
-          required: true,
-          minLength: 5,
-          maxLength: 5,
-        },
-        valid: false,
-        touched: false,
-      },
-      country: {
-        elementType: 'input',
-        elementConfig: {
-          type: 'text',
-          placeholder: 'Country',
-        },
-        value: '',
-        validation: {
-          required: true,
-        },
-        valid: false,
-        touched: false,
-      },
-      email: {
-        elementType: 'email',
-        elementConfig: {
-          type: 'text',
-          placeholder: 'Email',
-        },
-        value: '',
-        validation: {
-          required: true,
-        },
-        valid: false,
-        touched: false,
-      },
-      delveryMethod: {
-        elementType: 'select',
-        elementConfig: {
-          options: [
-            { value: '', displayValue: 'Select Delivery Method' },
-            { value: 'Teleport', displayValue: 'Teleport' },
-            { value: 'Cheapest', displayValue: 'Cheapest' },
-          ],
-          placeholder: 'Deliver Method',
-        },
-        value: 'Teleport',
-        validation: {},
-        valid: true,
-      },
+      valid: false,
+      touched: false,
     },
-    formIsValid: false,
-  };
+    street: {
+      elementType: 'input',
+      elementConfig: {
+        type: 'text',
+        placeholder: 'Street',
+      },
+      value: '',
+      validation: {
+        required: true,
+      },
+      valid: false,
+      touched: false,
+    },
+    zipCode: {
+      elementType: 'input',
+      elementConfig: {
+        type: 'text',
+        placeholder: 'ZIP Code',
+      },
+      value: '',
+      validation: {
+        required: true,
+        minLength: 5,
+        maxLength: 5,
+      },
+      valid: false,
+      touched: false,
+    },
+    country: {
+      elementType: 'input',
+      elementConfig: {
+        type: 'text',
+        placeholder: 'Country',
+      },
+      value: '',
+      validation: {
+        required: true,
+      },
+      valid: false,
+      touched: false,
+    },
+    email: {
+      elementType: 'email',
+      elementConfig: {
+        type: 'text',
+        placeholder: 'Email',
+      },
+      value: '',
+      validation: {
+        required: true,
+      },
+      valid: false,
+      touched: false,
+    },
+    delveryMethod: {
+      elementType: 'select',
+      elementConfig: {
+        options: [
+          { value: '', displayValue: 'Select Delivery Method' },
+          { value: 'Teleport', displayValue: 'Teleport' },
+          { value: 'Cheapest', displayValue: 'Cheapest' },
+        ],
+        placeholder: 'Deliver Method',
+      },
+      value: 'Teleport',
+      validation: {},
+      valid: true,
+    },
+  });
+  const [formIsValid, setFormIsValid] = useState(false);
 
-  orderSubmitHandler = event => {
+  const orderSubmitHandler = event => {
     event.preventDefault();
-    
-    
 
     const formData = {};
-    for (let formElement in this.state.orderForm) {
-      formData[formElement] = this.state.orderForm[formElement].value;
+    for (let formElement in orderForm) {
+      formData[formElement] = orderForm[formElement].value;
     }
-    
 
     const order = {
-      ingredients: this.props.ingredients,
-      price: this.props.price,
+      ingredients: props.ingredients,
+      price: props.price,
       orderData: formData,
-      userId: this.props.userId,
+      userId: props.userId,
     };
-    this.props.onOrderBurger(order, this.props.token);
+    props.onOrderBurger(order, props.token);
   };
 
   // inputChangeHandler = Two-way binding
-  inputChangeHandler = (event, inputId) => {
-    const updatedFormElement = updateObject(this.state.orderForm[inputId], {
+  const inputChangeHandler = (event, inputId) => {
+    const updatedFormElement = updateObject(orderForm[inputId], {
       value: event.target.value,
-      valid: checkInputValidity(event.target.value, this.state.orderForm[inputId].validation),
+      valid: checkInputValidity(event.target.value, orderForm[inputId].validation),
       touched: true,
     });
 
-    const updatedOrderForm = updateObject(this.state.orderForm, {
+    const updatedOrderForm = updateObject(orderForm, {
       [inputId]: updatedFormElement,
     });
 
@@ -135,50 +130,45 @@ class ContactData extends Component {
     for (let input in updatedOrderForm) {
       formIsValid = updatedOrderForm[input].valid && formIsValid;
     }
-
-    this.setState({
-      orderForm: updatedOrderForm,
-      formIsValid: formIsValid,
-    });
+    setOrderForm(updatedOrderForm);
+    setFormIsValid(formIsValid);
   };
 
-  render() {
-    const formElementsArray = [];
-    for (let key in this.state.orderForm) {
-      formElementsArray.push(
-        <Input
-          key={key}
-          elementType={this.state.orderForm[key].elementType}
-          elementConfig={this.state.orderForm[key].elementConfig}
-          value={this.state.orderForm[key].value}
-          inputChange={event => this.inputChangeHandler(event, key)}
-          invalid={!this.state.orderForm[key].valid}
-          shouldValidate={this.state.orderForm[key].validation}
-          touched={this.state.orderForm[key].touched}
-        />
-      );
-    }
-
-    let form = (
-      <form onSubmit={this.orderSubmitHandler}>
-        {formElementsArray.map(formElement => formElement)}
-        <Button btnType='Success' disabled={!this.state.formIsValid}>
-          ORDER
-        </Button>
-      </form>
-    );
-    if (this.props.loading) {
-      form = <Spinner />;
-    }
-
-    return (
-      <div className={classes.ContactData}>
-        <h4>Enter your contact data</h4>
-        {form}
-      </div>
+  const formElementsArray = [];
+  for (let key in orderForm) {
+    formElementsArray.push(
+      <Input
+        key={key}
+        elementType={orderForm[key].elementType}
+        elementConfig={orderForm[key].elementConfig}
+        value={orderForm[key].value}
+        inputChange={event => inputChangeHandler(event, key)}
+        invalid={!orderForm[key].valid}
+        shouldValidate={orderForm[key].validation}
+        touched={orderForm[key].touched}
+      />
     );
   }
-}
+
+  let form = (
+    <form onSubmit={orderSubmitHandler}>
+      {formElementsArray.map(formElement => formElement)}
+      <Button btnType='Success' disabled={!formIsValid}>
+        ORDER
+      </Button>
+    </form>
+  );
+  if (props.loading) {
+    form = <Spinner />;
+  }
+
+  return (
+    <div className={classes.ContactData}>
+      <h4>Enter your contact data</h4>
+      {form}
+    </div>
+  );
+};
 
 const mapStateToProps = state => {
   return {

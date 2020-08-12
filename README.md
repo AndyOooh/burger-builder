@@ -1,5 +1,12 @@
 *With Hooks Branch!!
 
+- Opposed to Max I kept Capitalised component names agfter converting to function components as I was getting (linting?) errors otherwise.
+- Used useState and useEffect whereever applicaple. With that also cleaned up the use of 'this'. With useEffect you will often get errors regarding dependencies that we ignore when supplying empty array of dependencies. We are encouraged to do object destructuring on the props object to be able to add the dependencies (the ones from the props object).
+- replaced our custom AsyncComponent with React.lazy and Suspense. lazy and Supense (used together) is for optimization, usually used to load different pages/paths asynchronously.
+- Replaced ShouldComponentUpdate with React.memo. Child components wrapped memo only re-renders when their own props/state changes and not every time their parent component rerenders.
+- Created the custom hook http-errorHandler (or useHttpErrorHandler) to use in withErrorHandler but also available for other future use cases.
+Replaced connect and mapStateToProps + mapDipatchToProps with useSelector and useDispatch in BurgerBuilder.js. Could implement in all components but only here to show it. Had to wrap one dispatch (onInitIngredients) in useCallback with empty arrayof dependencies to avoid continuous http requests.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
